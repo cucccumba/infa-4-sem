@@ -1,4 +1,5 @@
 #include "world.h"
+#include <random>
 
 World::World(sf::Vector2u windsize)
 {
@@ -30,11 +31,18 @@ int World::GetBlockSize()
     return blocksize;
 }
 
+sf::Vector2i World::GetApple()
+{
+    return apple;
+}
+
 void World::RespawnApple()
 {
     int maxX = (windowsize.x / blocksize) - 2;
     int maxY = (windowsize.y / blocksize) - 2;
-    item = sf::Vector2i(rand() % maxX + 1, rand() % maxY + 1);
+    apple.x = rand() % maxX + 1;
+    apple.y = rand() % maxY + 1;
+    item = sf::Vector2i(apple.x, apple.y);
     appleshape.setPosition(item.x * blocksize, item.y * blocksize);
 }
 
@@ -45,7 +53,7 @@ void World::Render(sf::RenderWindow &window)
     window.draw(appleshape);
 }
 
-void World::Update(Snake &player)
+void World::Update(Snake &player, std::vector<Snake> players)
 {
     if (player.GetPosition() == item)
     {
@@ -57,6 +65,25 @@ void World::Update(Snake &player)
     int grindSizeX = windowsize.x / blocksize;
     int grindSizeY = windowsize.y / blocksize;
 
+    //смотрим столкновение со стенками
     if (player.GetPosition().x <= 0 || player.GetPosition().y <= 0 || player.GetPosition().x >= grindSizeX - 1 || player.GetPosition().y >= grindSizeY - 1)
         player.Lose();
+
+    //смотрим столкновение с другими змеями
+    sf::Vector2i head = player.GetPosition();
+    int PlayerNum = player.GetNumber();
+    for (auto & itr : players)
+    {
+        if (itr.GetNumber() != PlayerNum)
+        {
+            for (auto & itr1 : itr.GetSnakebody())
+            {
+                if (itr1.position == head)
+                {
+                    player.Lose();
+                    break;
+                }
+            }
+        }
+    }
 }

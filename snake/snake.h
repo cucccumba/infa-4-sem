@@ -22,7 +22,7 @@ using SnakeContainer = std::vector<SnakeSegment>;
 class Snake
 {
 public:
-    Snake (int blocksize);
+    Snake (int blocksize, int num, bool bot);
     ~Snake();
 
     void SetDirection(Direction dir);
@@ -30,14 +30,16 @@ public:
     int GetSpeed();
     sf::Vector2i GetPosition();
     int GetScore();
+    int GetNumber();
+    SnakeContainer GetSnakebody();
     void IncreaseScore();
     bool HasLost();
     void Lose();
     void ToggleLost();
     void Extend();
     void Reset();
-    void Move();
-    void Tick();
+    void Move(sf::Vector2i apple);
+    void Tick(sf::Vector2i apple);
     void Render(sf::RenderWindow &window);
 
 private:
@@ -48,5 +50,7 @@ private:
     int speed;
     int score;
     bool lost;
+    bool isbot;
+    int number;
     sf::RectangleShape bodyRect;
 };

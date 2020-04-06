@@ -1,8 +1,10 @@
 #include "snake.h"
 
-Snake::Snake(int blocksize)
+Snake::Snake(int blocksize, int num, bool bot)
 {
     size = blocksize;
+    number = num;
+    isbot = bot;
     bodyRect.setSize(sf::Vector2f(size - 1, size - 1));
     Reset();
 }
@@ -12,11 +14,28 @@ Snake::~Snake() {};
 void Snake::Reset()
 {
     snakebody.clear();
-    snakebody.push_back(SnakeSegment(5, 7));
-    snakebody.push_back(SnakeSegment(5, 6));
-    snakebody.push_back(SnakeSegment(5, 5));
+    if (number == 1)
+    {
+        snakebody.push_back(SnakeSegment(5, 7));
+        snakebody.push_back(SnakeSegment(5, 6));
+        snakebody.push_back(SnakeSegment(5, 5));
+    }
+    else if (number == 2)
+    {
+        snakebody.push_back(SnakeSegment(25, 7));
+        snakebody.push_back(SnakeSegment(25, 6));
+        snakebody.push_back(SnakeSegment(25, 5));
+    }
+    else if (number == 3)
+    {
+        snakebody.push_back(SnakeSegment(45, 7));
+        snakebody.push_back(SnakeSegment(45, 6));
+        snakebody.push_back(SnakeSegment(45, 5));
+    }
 
     SetDirection(Direction::None);
+    if (isbot)
+        SetDirection(Direction::Right);
     speed = 20;
     score = 0;
     lost = false;
@@ -45,6 +64,11 @@ sf::Vector2i Snake::GetPosition()
 int Snake::GetScore()
 {
     return score;
+}
+
+int Snake::GetNumber()
+{
+    return number;
 }
 
 void Snake::IncreaseScore()
@@ -109,23 +133,70 @@ void Snake::Extend()
             snakebody.push_back(SnakeSegment(tail_head.position.x - 1, tail_head.position.y));
         }
     }
-    speed += 1;
 }
 
-void Snake::Tick()
+void Snake::Tick(sf::Vector2i apple)
 {
     if (snakebody.empty())
         return;
     if (direction == Direction::None)
         return;
-    Move();
+    Move(apple);
     CheckCollision();
 }
 
-void Snake::Move()
+void Snake::Move(sf::Vector2i apple)
 {
     for (int i = snakebody.size() - 1; i > 0; --i)
         snakebody[i].position = snakebody[i - 1].position;
+    if (isbot)
+    {
+        if (apple.x == snakebody[0].position.x)
+        {
+            if (apple.y < snakebody[0].position.y)
+                direction = Direction::Up;
+            else
+                direction = Direction::Down;
+        }
+        else if (apple.y == snakebody[0].position.y)
+        {
+            if (apple.x < snakebody[0].position.x)
+                direction = Direction::Left;
+            else
+                direction = Direction::Right;
+        }
+        else
+        {
+            if (apple.x < snakebody[0].position.x && apple.y < snakebody[0].position.y && (direction == Direction::Down || direction == Direction::Right))
+            {
+                if (direction == Direction::Down)
+                    direction = Direction::Left;
+                else
+                    direction = Direction::Up;
+            }
+            else if (apple.x < snakebody[0].position.x && apple.y > snakebody[0].position.y && (direction == Direction::Up || direction == Direction::Right))
+            {
+                if (direction == Direction::Up)
+                    direction = Direction::Left;
+                else
+                    direction = Direction::Down;
+            }
+            else if (apple.x > snakebody[0].position.x && apple.y < snakebody[0].position.y && (direction == Direction::Down || direction == Direction::Left))
+            {
+                if (direction == Direction::Down)
+                    direction = Direction::Right;
+                else
+                    direction = Direction::Up;
+            }
+            else if (apple.x > snakebody[0].position.x && apple.y > snakebody[0].position.y && (direction == Direction::Up || direction == Direction::Left))
+            {
+                if (direction == Direction::Up)
+                    direction = Direction::Right;
+                else
+                    direction = Direction::Down;
+            }
+        }
+    }
     if (direction == Direction::Left)
     {
         --snakebody[0].position.x;
@@ -165,6 +236,8 @@ void Snake::Render(sf::RenderWindow &window)
         return;
     auto head = snakebody.begin();
     bodyRect.setFillColor(sf::Color::Yellow);
+    if (isbot)
+        bodyRect.setFillColor(sf::Color::White);
     bodyRect.setPosition(head->position.x * size, head->position.y * size);
     window.draw(bodyRect);
 
@@ -174,4 +247,9 @@ void Snake::Render(sf::RenderWindow &window)
         bodyRect.setPosition(itr->position.x * size, itr->position.y * size);
         window.draw(bodyRect);
     }
+}
+
+SnakeContainer Snake::GetSnakebody()
+{
+    return snakebody;
 }

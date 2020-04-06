@@ -10,15 +10,15 @@ public:
 
     int GetBlockSize();
     void RespawnApple();
-
-    void Update(Snake &player);
+    sf::Vector2i GetApple();
+    void Update(Snake &player, std::vector<Snake> players);
     void Render(sf::RenderWindow &window);
 
 private:
     sf::Vector2u windowsize;
     sf::Vector2i item;
     int blocksize;
-
+    sf::Vector2i apple;
     sf::CircleShape appleshape;
     sf::RectangleShape bounds[4];
 };

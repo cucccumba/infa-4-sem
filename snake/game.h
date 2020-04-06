@@ -17,7 +17,7 @@ public:
 
 private:
     World world;
-    Snake snake;
+    std::vector<Snake> players;
     Window window;
     sf::Clock clock;
     sf::Time elapsed;

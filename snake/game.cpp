@@ -1,28 +1,35 @@
 #include "game.h"
 
 Game::Game()
-: window("Snake", sf::Vector2u(1920, 1080)), snake(world.GetBlockSize()), world(sf::Vector2u(1920, 1080))
-{}
+: window("Snake", sf::Vector2u(1920, 1080)), world(sf::Vector2u(1920, 1080))
+{
+    Snake Player(world.GetBlockSize(), 1, false);
+    Snake bot1(world.GetBlockSize(), 2, true);
+    Snake bot2(world.GetBlockSize(), 3, true);
+    players.push_back(Player);
+    players.push_back(bot1);
+    players.push_back(bot2);
+}
 
 Game::~Game(){}
 
 void Game::HandleInput()
 {
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && snake.GetDirection() != Direction::Down)
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && players[0].GetDirection() != Direction::Down)
     {
-        snake.SetDirection(Direction::Up);
+        players[0].SetDirection(Direction::Up);
     }
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && snake.GetDirection() != Direction::Up)
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && players[0].GetDirection() != Direction::Up)
     {
-        snake.SetDirection(Direction::Down);
+        players[0].SetDirection(Direction::Down);
     }
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && snake.GetDirection() != Direction::Right)
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && players[0].GetDirection() != Direction::Right)
     {
-        snake.SetDirection(Direction::Left);
+        players[0].SetDirection(Direction::Left);
     }
-    else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && snake.GetDirection() != Direction::Left)
+    else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && players[0].GetDirection() != Direction::Left)
     {
-        snake.SetDirection(Direction::Right);
+        players[0].SetDirection(Direction::Right);
     }
 }
 
@@ -30,14 +37,19 @@ void Game::Update()
 {
     window.Update();
     float Elapsed = elapsed.asSeconds();
-    float timestep = 1.0f / snake.GetSpeed();
+    float timestep = 1.0f / players[0].GetSpeed();
     if (Elapsed >= timestep)
     {
-        snake.Tick();
-        world.Update(snake);
+        for (auto & player : players)
+            player.Tick(world.GetApple());
+        for (auto & player : players)
+            world.Update(player, players);
         elapsed -= sf::seconds(timestep);
-        if (snake.HasLost())
-            snake.Reset();
+        for (auto & player : players)
+        {
+            if (player.HasLost())
+                player.Reset();
+        }
     }
 }
 
@@ -45,7 +57,8 @@ void Game::Render()
 {
     window.ClearWindow();
     world.Render(*window.GetRenderWindow());
-    snake.Render(*window.GetRenderWindow());
+    for (auto itr = players.begin(); itr != players.end(); ++itr)
+        (*itr).Render(*window.GetRenderWindow());
     window.Display();
 }
 
