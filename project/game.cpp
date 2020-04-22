@@ -1,52 +1,72 @@
 #include "game.h"
 
 Game::Game()
-: window("window", sf::Vector2u(1920, 1080))
-{
-    mashroomTexture.loadFromFile(R"(C:\Users\a-r-t\Pictures\mashroom.png)");
-    mashroom.setTexture(mashroomTexture);
-    increment = sf::Vector2i(400, 400);
-}
+: window("Snake", sf::Vector2u(1920, 1080)),  ship(16, sf::Vector2u(1920, 1080)), swarm(16)
+{}
 
 Game::~Game(){}
+
+void Game::HandleInput()
+{
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && ship.GetPosition().y > 0)
+    {
+        ship.SetDirection(Direction::Up);
+    }
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && ship.GetPosition().y < (window.GetWindowSize().y / ship.GetSize()))
+    {
+        ship.SetDirection(Direction::Down);
+    }
+    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && ship.GetPosition().x > 0)
+    {
+        ship.SetDirection(Direction::Left);
+    }
+    else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && ship.GetPosition().x < (window.GetWindowSize().x / ship.GetSize()))
+    {
+        ship.SetDirection(Direction::Right);
+    }
+    else
+    {
+        ship.SetDirection(Direction::None);
+    }
+}
 
 void Game::Update()
 {
     window.Update();
-    MoveMushroom();
-}
-
-void Game::MoveMushroom()
-{
-    sf::Vector2u l_windSize = window.GetWindowSize();
-    sf::Vector2u l_textSize = mashroomTexture.getSize();
     float Elapsed = elapsed.asSeconds();
-    if((mashroom.getPosition().x > l_windSize.x - l_textSize.x && increment.x > 0) || (mashroom.getPosition().x < 0 && increment.x < 0))
+    float ElapsedEnemies = elapsedEnemies.asSeconds();
+    float timestep = 1.0f / ship.GetSpeed();
+    if (Elapsed >= timestep)
     {
-        increment.x = -increment.x;
+        int x = 5;
+        int y = 1;
+        if (ElapsedEnemies > 3)
+        {
+            for (int i = 0; i < 3; ++i)
+            {
+                swarm.Add(x, y);
+                x += 10;
+            }
+            elapsedEnemies -= sf::seconds(ElapsedEnemies);
+        }
+        ship.Tick();
+        KillEnemy();
+        swarm.Move(window.GetWindowSize());
+        elapsed -= sf::seconds(timestep);
     }
-    if((mashroom.getPosition().y > l_windSize.y - l_textSize.y && increment.y > 0) || (mashroom.getPosition().y < 0 && increment.y < 0))
-    {
-        increment.y = -increment.y;
-    }
-    mashroom.setPosition(mashroom.getPosition().x + increment.x * Elapsed,mashroom.getPosition().y + increment.y * Elapsed);
 }
-
 void Game::Render()
 {
     window.ClearWindow();
-    window.Draw(mashroom);
+    ship.Render(*window.GetRenderWindow());
+    swarm.Render(*window.GetRenderWindow());
     window.Display();
-}
-
-sf::Time Game::GetElapsed()
-{
-    return elapsed;
 }
 
 void Game::Restartclock()
 {
-    elapsed = clock.restart();
+    elapsed += clock.restart();
+    elapsedEnemies += elapsed;
 }
 
 Window *Game::GetWindow()
@@ -54,3 +74,9 @@ Window *Game::GetWindow()
     return &window;
 }
 
+void Game::KillEnemy()
+{
+    swarm.Kill((*ship.GetShooting()).GetShootingC());
+    swarm.Kill((*ship.GetShooting()).GetShootingL());
+    swarm.Kill((*ship.GetShooting()).GetShootingR());
+}

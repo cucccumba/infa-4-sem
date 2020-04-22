@@ -1,27 +1,28 @@
 #pragma once
 
 #include "window.h"
+#include "world.h"
+#include "enemy.h"
 class Game
 {
 public:
     Game();
     ~Game();
 
-    sf::Time GetElapsed();
     void Restartclock();
 
     void HandleInput();
     void Update();
     void Render();
+    void KillEnemy();
     Window* GetWindow();
 
 private:
-    void MoveMushroom();
+    Starship ship;
+    Swarm swarm;
     Window window;
     sf::Clock clock;
+    sf::Clock enemies;
     sf::Time elapsed;
-    sf::Texture mashroomTexture;
-    sf::Sprite mashroom;
-    sf::Vector2i increment;
-    //textures ...
+    sf::Time elapsedEnemies;
 };
