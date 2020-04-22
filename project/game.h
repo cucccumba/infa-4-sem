@@ -1,8 +1,8 @@
 #pragma once
 
 #include "window.h"
-#include "world.h"
 #include "enemy.h"
+#include "starship.h"
 class Game
 {
 public:
