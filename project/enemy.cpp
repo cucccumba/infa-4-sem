@@ -12,7 +12,7 @@ Swarm::~Swarm()= default;
 
 void Swarm::Add(int x, int y)
 {
-    swarm.push_back(Enemy(x, y));
+    swarm.push_back(Enemy(x, y, size));
 }
 
 void Swarm::Move(sf::Vector2u windsize)
@@ -36,13 +36,39 @@ void Swarm::Kill(AmmoContainer* shooting)
    {
        for (auto itr = swarm.begin(); itr < swarm.end(); ++itr)
        {
-           if ((*itr1).position == (*itr).position)
+           if (((*itr1).position == (*itr).position ) || (((*itr1).position.y + 1 == (*itr).position.y) && (*itr1).position.x == (*itr).position.x))
            {
                swarm.erase(itr);
                (*shooting).erase(itr1);
            }
+           if ((*itr1).type == -1)  //left fire
+           {
+               if ((((*itr1).position.y + 1 == (*itr).position.y) && (*itr1).position.x + 1 == (*itr).position.x))
+               {
+                   swarm.erase(itr);
+                   (*shooting).erase(itr1);
+               }
+           }
+           if ((*itr1).type == 1)  //right fire
+           {
+               if ((((*itr1).position.y + 1 == (*itr).position.y) && (*itr1).position.x - 1 == (*itr).position.x))
+               {
+                   swarm.erase(itr);
+                   (*shooting).erase(itr1);
+               }
+           }
        }
    }
+}
+
+void Swarm::Fire(sf::Vector2u windsize)
+{
+    for (auto & enemy : swarm)
+    {
+        enemy.shooting.Add(enemy.position.x, enemy.position.y);
+        enemy.shooting.Move(windsize, true);
+    }
+
 }
 
 void Swarm::Render(sf::RenderWindow &window)
@@ -51,5 +77,6 @@ void Swarm::Render(sf::RenderWindow &window)
     {
         Enemyshape.setPosition(enemy.position.x * size, enemy.position.y * size);
         window.draw(Enemyshape);
+        enemy.shooting.Render(window);
     }
 }

@@ -110,5 +110,5 @@ void Starship::Render(sf::RenderWindow &window)
 void Starship::Fire()
 {
     shooting.Add(position.x, position.y);
-    shooting.Move(windowsize);
+    shooting.Move(windowsize, false);
 }

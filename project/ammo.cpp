@@ -11,39 +11,51 @@ Shooting::~Shooting() = default;
 
 void Shooting::Add(int x, int y)
 {
-    shootingC.push_back(Ammo(x, y));
-    shootingL.push_back(Ammo(x, y));
-    shootingR.push_back(Ammo(x, y));
+    shootingC.push_back(Ammo(x, y, 0));
+    shootingL.push_back(Ammo(x, y, -1));
+    shootingR.push_back(Ammo(x, y, 1));
 }
 
-void Shooting::Move(sf::Vector2u windsize)
+void Shooting::Move(sf::Vector2u windsize, bool is_enemy)
 {
     for (auto & shoot : shootingC)
-        shoot.position.y -= 2;
+    {
+        if (is_enemy)
+            shoot.position.y += 2;
+        else
+            shoot.position.y -= 2;
+    }
+
     for (auto & shoot : shootingL)
     {
-        shoot.position.y -= 2;
+        if (is_enemy)
+            shoot.position.y += 2;
+        else
+            shoot.position.y -= 2;
         shoot.position.x -= 1;
     }
     for (auto & shoot : shootingR)
     {
-        shoot.position.y -= 2;
+        if (is_enemy)
+            shoot.position.y += 2;
+        else
+            shoot.position.y -= 2;
         shoot.position.x += 1;
     }
 
     for (auto itr = shootingC.begin(); itr < shootingC.end(); ++itr)
     {
-        if ((*itr).position.y < 0)
+        if ((*itr).position.y < 0 || (*itr).position.y > windsize.y / size)
             shootingC.erase(itr);
     }
     for (auto itr = shootingL.begin(); itr < shootingL.end(); ++itr)
     {
-        if ((*itr).position.y < 0 || (*itr).position.x < 0)
+        if ((*itr).position.y < 0 || (*itr).position.x < 0 || (*itr).position.y > windsize.y / size)
             shootingL.erase(itr);
     }
     for (auto itr = shootingR.begin(); itr < shootingR.end(); ++itr)
     {
-        if ((*itr).position.y < 0 || (*itr).position.x > windsize.x / size)
+        if ((*itr).position.y < 0 || (*itr).position.x > windsize.x / size || (*itr).position.y > windsize.y / size)
             shootingR.erase(itr);
     }
 }

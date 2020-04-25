@@ -34,24 +34,30 @@ void Game::Update()
 {
     window.Update();
     float Elapsed = elapsed.asSeconds();
-    float ElapsedEnemies = elapsedEnemies.asSeconds();
+    float Elapsed_Enemies_spawn = elapsed_Enemies_spawn.asSeconds();
+    float Elapsed_Enemies_move = elapsed_Enemies_move.asSeconds();
     float timestep = 1.0f / ship.GetSpeed();
     if (Elapsed >= timestep)
     {
         int x = 5;
         int y = 1;
-        if (ElapsedEnemies > 3)
+        if (Elapsed_Enemies_spawn >= 10)
         {
             for (int i = 0; i < 3; ++i)
             {
                 swarm.Add(x, y);
                 x += 10;
             }
-            elapsedEnemies -= sf::seconds(ElapsedEnemies);
+            elapsed_Enemies_spawn -= sf::seconds(Elapsed_Enemies_spawn);
         }
         ship.Tick();
         KillEnemy();
-        swarm.Move(window.GetWindowSize());
+        if (Elapsed_Enemies_move >= 20 * timestep)
+        {
+            swarm.Fire(window.GetWindowSize());
+            swarm.Move(window.GetWindowSize());
+            elapsed_Enemies_move -= sf::seconds(Elapsed_Enemies_move);
+        }
         elapsed -= sf::seconds(timestep);
     }
 }
@@ -66,7 +72,8 @@ void Game::Render()
 void Game::Restartclock()
 {
     elapsed += clock.restart();
-    elapsedEnemies += elapsed;
+    elapsed_Enemies_spawn += elapsed;
+    elapsed_Enemies_move += elapsed;
 }
 
 Window *Game::GetWindow()
