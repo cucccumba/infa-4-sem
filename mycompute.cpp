@@ -40,6 +40,7 @@ int Count(vector<pair<int, Op>> data)
             it->first = left * right;
             it->second = p;
             data.erase(next(it));
+            --it;
         }
     }
     for (auto it = data.begin(); it < data.end(); ++it)
