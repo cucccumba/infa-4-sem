@@ -99,7 +99,8 @@ void Solve (int result, Iterator begin, Iterator end, vector<pair<int, Op>> new_
                 new_data.push_back(pair<int, Op>(prev(end)->first, Op::None));
             Solve(result, begin, end, new_data);
             new_data.pop_back();
-            new_data.pop_back();
+            if (begin == prev(prev(end)))
+                new_data.pop_back();
         }
     }
     else
@@ -123,6 +124,27 @@ int main(int args, char* argv[])
 
     vector<pair<int, Op>> new_data;
     vector<Op> ops = {Op::Merge, Op::Minus, Op::Plus, Op::Mul};
+
+    if (data.size() == 2)
+    {
+        for (auto op : ops)
+        {
+            pair<int, Op> p;
+            p.first = data[0].first;
+            p.second = op;
+            new_data.push_back(p);
+            new_data.push_back(pair<int, Op>(data[1].first, Op::None));
+            int answer = Count(new_data);
+            if (answer == result)
+            {
+                Print_answer(result, new_data);
+            }
+            new_data.erase(prev(new_data.end()));
+            new_data.erase(new_data.begin());
+        }
+        return 0;
+    }
+
     for (auto op : ops)
     {
         pair<int, Op> p;
