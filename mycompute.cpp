@@ -129,6 +129,7 @@ int main(int args, char* argv[])
         p.second = op;
         new_data.push_back(p);
         Solve(result, data.begin(), data.end(), new_data);
+        new_data.erase(new_data.begin());
     }
     return 0;
 }
