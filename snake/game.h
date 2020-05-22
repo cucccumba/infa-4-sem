@@ -2,6 +2,7 @@
 
 #include "window.h"
 #include "world.h"
+#include "TextBox.h"
 class Game
 {
 public:
@@ -17,6 +18,7 @@ public:
 
 private:
     World world;
+    TextBox textBox;
     std::vector<Snake> players;
     Window window;
     sf::Clock clock;

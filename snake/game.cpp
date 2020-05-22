@@ -3,6 +3,8 @@
 Game::Game()
 : window("Snake", sf::Vector2u(1920, 1080)), world(sf::Vector2u(1920, 1080))
 {
+    textBox.Setup(5, 14, 350, sf::Vector2f(10, 10));
+    textBox.Add("Snake game");
     Snake Player(world.GetBlockSize(), 1, false);
     Snake bot1(world.GetBlockSize(), 2, true);
     Snake bot2(world.GetBlockSize(), 3, true);
@@ -43,7 +45,7 @@ void Game::Update()
         for (auto & player : players)
             player.Tick(world.GetApple());
         for (auto & player : players)
-            world.Update(player, players);
+            world.Update(player, players, textBox);
         elapsed -= sf::seconds(timestep);
         for (auto & player : players)
         {
@@ -59,6 +61,7 @@ void Game::Render()
     world.Render(*window.GetRenderWindow());
     for (auto itr = players.begin(); itr != players.end(); ++itr)
         (*itr).Render(*window.GetRenderWindow());
+    textBox.Render(*window.GetRenderWindow());
     window.Display();
 }
 

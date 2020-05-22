@@ -2,6 +2,9 @@
 
 #include "window.h"
 #include "snake.h"
+#include "TextBox.h"
+#include <sstream>
+
 class World
 {
 public:
@@ -11,7 +14,7 @@ public:
     int GetBlockSize();
     void RespawnApple();
     sf::Vector2i GetApple();
-    void Update(Snake &player, std::vector<Snake> players);
+    void Update(Snake &player, std::vector<Snake> players, TextBox &textBox);
     void Render(sf::RenderWindow &window);
 
 private:

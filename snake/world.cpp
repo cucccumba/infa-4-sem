@@ -53,12 +53,13 @@ void World::Render(sf::RenderWindow &window)
     window.draw(appleshape);
 }
 
-void World::Update(Snake &player, std::vector<Snake> players)
+void World::Update(Snake &player, std::vector<Snake> players, TextBox &textBox)
 {
     if (player.GetPosition() == item)
     {
         player.Extend();
         player.IncreaseScore();
+        textBox.Add("Player " + std::to_string(player.GetNumber()) +" ate an apple. Score: " + std::to_string(player.GetScore()));
         RespawnApple();
     }
 
@@ -67,7 +68,11 @@ void World::Update(Snake &player, std::vector<Snake> players)
 
     //смотрим столкновение со стенками
     if (player.GetPosition().x <= 0 || player.GetPosition().y <= 0 || player.GetPosition().x >= grindSizeX - 1 || player.GetPosition().y >= grindSizeY - 1)
+    {
         player.Lose();
+        textBox.Add("Player " + std::to_string(player.GetNumber()) + " hit the wall");
+    }
+
 
     //смотрим столкновение с другими змеями
     sf::Vector2i head = player.GetPosition();
@@ -81,6 +86,7 @@ void World::Update(Snake &player, std::vector<Snake> players)
                 if (itr1.position == head)
                 {
                     player.Lose();
+                    textBox.Add("Player " + std::to_string(player.GetNumber()) + " hit Player " + std::to_string(itr.GetNumber()));
                     break;
                 }
             }
