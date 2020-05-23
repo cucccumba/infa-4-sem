@@ -23,7 +23,7 @@ public:
     Direction GetDirection();
     sf::Vector2i GetPosition();
     int GetScore();
-    void IncreaseScore();
+    void IncreaseScore(int x);
     bool HasLost();
     void Lose();
     void Tick();
@@ -32,7 +32,9 @@ public:
     int GetSize();
     void Fire();
     sf::Vector2u GetWindowSize();
-    Shooting* GetShooting();
+    Shooting &GetShooting();
+    void Decrease_Health();
+    int GetHealth();
 
 private:
     int size;
@@ -41,7 +43,9 @@ private:
     int score;
     int speed;
     bool lost;
+    int hp;
     sf::Vector2i position;
     sf::Vector2u windowsize;
-    sf::RectangleShape ShipShape;
+    //sf::RectangleShape ShipShape;
+    sf::Texture ShipShape;
 };

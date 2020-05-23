@@ -22,9 +22,13 @@ public:
     void Move(sf::Vector2u windsize);
     void Fire(sf::Vector2u windsize);
     void Render(sf::RenderWindow &window);
-    void Kill(AmmoContainer* shooting);
+    int Kill(AmmoContainer& shooting);
+    std::vector<Shooting> &Get_deleted_shootings();
+    EnemyContainer &Get_Swarm();
 private:
     int size;
     EnemyContainer swarm;
-    sf::RectangleShape Enemyshape;
+    std::vector<Shooting> deleted_shootings;
+    //sf::RectangleShape Enemyshape;
+    sf::Texture enemy_shape;
 };

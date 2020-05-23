@@ -9,11 +9,16 @@ Shooting::Shooting(int Size)
 
 Shooting::~Shooting() = default;
 
-void Shooting::Add(int x, int y)
+void Shooting::Add(int x, int y, bool is_bot)
 {
-    shootingC.push_back(Ammo(x, y, 0));
-    shootingL.push_back(Ammo(x, y, -1));
-    shootingR.push_back(Ammo(x, y, 1));
+    if (is_bot)
+        shootingC.push_back(Ammo(x, y, 0));
+    else
+    {
+        shootingC.push_back(Ammo(x, y, 0));
+        shootingL.push_back(Ammo(x, y, -1));
+        shootingR.push_back(Ammo(x, y, 1));
+    }
 }
 
 void Shooting::Move(sf::Vector2u windsize, bool is_enemy)
@@ -21,25 +26,21 @@ void Shooting::Move(sf::Vector2u windsize, bool is_enemy)
     for (auto & shoot : shootingC)
     {
         if (is_enemy)
+        {
             shoot.position.y += 2;
+        }
         else
             shoot.position.y -= 2;
     }
 
     for (auto & shoot : shootingL)
     {
-        if (is_enemy)
-            shoot.position.y += 2;
-        else
-            shoot.position.y -= 2;
+        shoot.position.y -= 2;
         shoot.position.x -= 1;
     }
     for (auto & shoot : shootingR)
     {
-        if (is_enemy)
-            shoot.position.y += 2;
-        else
-            shoot.position.y -= 2;
+        shoot.position.y -= 2;
         shoot.position.x += 1;
     }
 
@@ -79,17 +80,17 @@ void Shooting::Render(sf::RenderWindow &window)
     }
 }
 
-AmmoContainer* Shooting::GetShootingC()
+AmmoContainer& Shooting::GetShootingC()
 {
-    return &shootingC;
+    return shootingC;
 }
 
-AmmoContainer* Shooting::GetShootingL()
+AmmoContainer& Shooting::GetShootingL()
 {
-    return &shootingL;
+    return shootingL;
 }
 
-AmmoContainer* Shooting::GetShootingR()
+AmmoContainer& Shooting::GetShootingR()
 {
-    return &shootingR;
+    return shootingR;
 }

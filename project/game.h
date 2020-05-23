@@ -3,6 +3,9 @@
 #include "window.h"
 #include "enemy.h"
 #include "starship.h"
+#include "world.h"
+#include "TextBox.h"
+
 class Game
 {
 public:
@@ -14,17 +17,17 @@ public:
     void HandleInput();
     void Update();
     void Render();
-    void KillEnemy();
+    int KillEnemy();
     Window* GetWindow();
 
 private:
-    Starship ship;
-    Swarm swarm;
     Window window;
+    Starship ship;
+    World world;
+    TextBox textBox;
     sf::Clock clock;
-    sf::Clock enemies;
-    sf::Clock enemies_move;
     sf::Time elapsed;
     sf::Time elapsed_Enemies_spawn;
     sf::Time elapsed_Enemies_move;
+    sf::Texture space_texture;
 };

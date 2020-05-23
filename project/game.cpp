@@ -1,8 +1,12 @@
 #include "game.h"
 
 Game::Game()
-: window("Snake", sf::Vector2u(1920, 1080)),  ship(16, sf::Vector2u(1920, 1080)), swarm(16)
-{}
+: window("Snake", sf::Vector2u(1920, 1080)),  ship(16, sf::Vector2u(1920, 1080)), world(16)
+{
+    textBox.Setup(5, 14, 350, sf::Vector2f(10, 10));
+    textBox.Add("Starship game");
+    space_texture.loadFromFile(R"(C:\Users\a-r-t\Pictures\space.jpg)");
+}
 
 Game::~Game(){}
 
@@ -39,24 +43,27 @@ void Game::Update()
     float timestep = 1.0f / ship.GetSpeed();
     if (Elapsed >= timestep)
     {
-        int x = 5;
-        int y = 1;
-        if (Elapsed_Enemies_spawn >= 10)
+        if (Elapsed_Enemies_spawn >= 5)
         {
-            for (int i = 0; i < 3; ++i)
-            {
-                swarm.Add(x, y);
-                x += 10;
-            }
+            world.Spawn_Enemies(window.GetWindowSize(), world.GetBlockSize());
             elapsed_Enemies_spawn -= sf::seconds(Elapsed_Enemies_spawn);
         }
         ship.Tick();
-        KillEnemy();
-        if (Elapsed_Enemies_move >= 20 * timestep)
+        int killed = KillEnemy();
+        if (killed > 0)
         {
-            swarm.Fire(window.GetWindowSize());
-            swarm.Move(window.GetWindowSize());
+            ship.IncreaseScore(killed);
+            textBox.Add("Score: " + std::to_string(ship.GetScore()));
+        }
+        if (Elapsed_Enemies_move >= 0.5)
+        {
+            world.Tick(window.GetWindowSize());
             elapsed_Enemies_move -= sf::seconds(Elapsed_Enemies_move);
+        }
+        world.Check_hits_to_ship(ship);
+        if (ship.HasLost())
+        {
+            textBox.Add("Game over");
         }
         elapsed -= sf::seconds(timestep);
     }
@@ -64,16 +71,21 @@ void Game::Update()
 void Game::Render()
 {
     window.ClearWindow();
+    sf::Sprite space_sprite(space_texture);
+    space_sprite.setPosition(0, 0);
+    window.GetRenderWindow()->draw(space_sprite);
     ship.Render(*window.GetRenderWindow());
-    swarm.Render(*window.GetRenderWindow());
+    world.Render(*window.GetRenderWindow());
+    textBox.Render(*window.GetRenderWindow());
     window.Display();
 }
 
 void Game::Restartclock()
 {
-    elapsed += clock.restart();
-    elapsed_Enemies_spawn += elapsed;
-    elapsed_Enemies_move += elapsed;
+    sf::Time time = clock.restart();
+    elapsed += time;
+    elapsed_Enemies_spawn += time;
+    elapsed_Enemies_move += time;
 }
 
 Window *Game::GetWindow()
@@ -81,9 +93,7 @@ Window *Game::GetWindow()
     return &window;
 }
 
-void Game::KillEnemy()
+int Game::KillEnemy()
 {
-    swarm.Kill((*ship.GetShooting()).GetShootingC());
-    swarm.Kill((*ship.GetShooting()).GetShootingL());
-    swarm.Kill((*ship.GetShooting()).GetShootingR());
+    return world.Kill_Enemy(ship.GetShooting());
 }

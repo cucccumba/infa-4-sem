@@ -17,11 +17,11 @@ public:
     Shooting(int size);
     ~Shooting();
     void Move(sf::Vector2u windsize, bool is_enemy);
-    void Add(int x, int y);
+    void Add(int x, int y, bool is_enemy);
     void Render(sf::RenderWindow &window);
-    AmmoContainer* GetShootingC();
-    AmmoContainer* GetShootingL();
-    AmmoContainer* GetShootingR();
+    AmmoContainer& GetShootingC();
+    AmmoContainer& GetShootingL();
+    AmmoContainer& GetShootingR();
 private:
     AmmoContainer shootingC;
     AmmoContainer shootingL;
