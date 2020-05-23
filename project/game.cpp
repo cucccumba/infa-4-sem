@@ -48,22 +48,34 @@ void Game::Update()
             world.Spawn_Enemies(window.GetWindowSize(), world.GetBlockSize());
             elapsed_Enemies_spawn -= sf::seconds(Elapsed_Enemies_spawn);
         }
-        ship.Tick();
-        int killed = KillEnemy();
-        if (killed > 0)
+        if (!ship.HasLost())
         {
-            ship.IncreaseScore(killed);
-            textBox.Add("Score: " + std::to_string(ship.GetScore()));
+            ship.Tick();
+            int killed = KillEnemy();
+            if (killed > 0)
+            {
+                ship.IncreaseScore(killed);
+                textBox.Add("Score: " + std::to_string(ship.GetScore()));
+            }
         }
         if (Elapsed_Enemies_move >= 0.5)
         {
             world.Tick(window.GetWindowSize());
             elapsed_Enemies_move -= sf::seconds(Elapsed_Enemies_move);
         }
-        world.Check_hits_to_ship(ship);
+        if (!ship.HasLost())
+            world.Check_hits_to_ship(ship);
+        else
+        {
+            elapsed -= sf::seconds(timestep);
+            return;
+        }
         if (ship.HasLost())
         {
             textBox.Add("Game over");
+            ship.GetShooting().GetShootingC().clear();
+            ship.GetShooting().GetShootingL().clear();
+            ship.GetShooting().GetShootingR().clear();
         }
         elapsed -= sf::seconds(timestep);
     }
@@ -74,7 +86,8 @@ void Game::Render()
     sf::Sprite space_sprite(space_texture);
     space_sprite.setPosition(0, 0);
     window.GetRenderWindow()->draw(space_sprite);
-    ship.Render(*window.GetRenderWindow());
+    if (!ship.HasLost())
+        ship.Render(*window.GetRenderWindow());
     world.Render(*window.GetRenderWindow());
     textBox.Render(*window.GetRenderWindow());
     window.Display();
