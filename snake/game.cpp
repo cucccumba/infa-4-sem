@@ -42,10 +42,12 @@ void Game::Update()
     float timestep = 1.0f / players[0].GetSpeed();
     if (Elapsed >= timestep)
     {
+        if (world.GetApples().Get_apples().size() < 10)
+            world.RespawnApple(window.GetWindowSize());
         for (auto & player : players)
-            player.Tick(world.GetApple());
+            player.Tick(world.GetApples());
         for (auto & player : players)
-            world.Update(player, players, textBox);
+            world.Update(player, players, textBox, window.GetWindowSize());
         elapsed -= sf::seconds(timestep);
         for (auto & player : players)
         {
@@ -74,4 +76,3 @@ Window *Game::GetWindow()
 {
     return &window;
 }
-

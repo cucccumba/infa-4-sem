@@ -1,6 +1,7 @@
 #pragma once
 
 #include "window.h"
+#include "apple.h"
 
 enum class Direction
 {
@@ -10,6 +11,7 @@ enum class Direction
     Left,
     Right
 };
+
 
 struct SnakeSegment
 {
@@ -38,8 +40,8 @@ public:
     void ToggleLost();
     void Extend();
     void Reset();
-    void Move(sf::Vector2i apple);
-    void Tick(sf::Vector2i apple);
+    void Move(apple_container &apples);
+    void Tick(apple_container &apples);
     void Render(sf::RenderWindow &window);
 
 private:

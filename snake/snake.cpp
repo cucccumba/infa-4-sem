@@ -135,65 +135,88 @@ void Snake::Extend()
     }
 }
 
-void Snake::Tick(sf::Vector2i apple)
+void Snake::Tick(apple_container &apples)
 {
     if (snakebody.empty())
         return;
     if (direction == Direction::None)
         return;
-    Move(apple);
+    Move(apples);
     CheckCollision();
 }
 
-void Snake::Move(sf::Vector2i apple)
+void Snake::Move(apple_container &apples)
 {
     for (int i = snakebody.size() - 1; i > 0; --i)
         snakebody[i].position = snakebody[i - 1].position;
     if (isbot)
     {
-        if (apple.x == snakebody[0].position.x)
+        if (!apples.Get_apples().empty())
         {
-            if (apple.y < snakebody[0].position.y)
-                direction = Direction::Up;
-            else
-                direction = Direction::Down;
-        }
-        else if (apple.y == snakebody[0].position.y)
-        {
-            if (apple.x < snakebody[0].position.x)
-                direction = Direction::Left;
-            else
-                direction = Direction::Right;
-        }
-        else
-        {
-            if (apple.x < snakebody[0].position.x && apple.y < snakebody[0].position.y && (direction == Direction::Down || direction == Direction::Right))
+            int closest = 0;
+            int closest_path = 0;
+            sf::Vector2i head_pos = snakebody.front().position;
+            for (int i = 0; i < apples.Get_apples().size(); ++i)
             {
-                if (direction == Direction::Down)
-                    direction = Direction::Left;
+                sf::Vector2i apple_pos = apples.Get_apples()[i].pos;
+                if (i == 0)
+                {
+                    closest_path = abs(head_pos.x - apple_pos.x + head_pos.y - apple_pos.y);
+                }
                 else
-                    direction = Direction::Up;
+                {
+                    int path = abs(head_pos.x - apples.Get_apples()[i].pos.x + head_pos.y - apple_pos.y);
+                    if (path < closest_path)
+                    {
+                        closest_path = path;
+                        closest = i;
+                    }
+                }
             }
-            else if (apple.x < snakebody[0].position.x && apple.y > snakebody[0].position.y && (direction == Direction::Up || direction == Direction::Right))
+            if (apples.Get_apples()[closest].pos.x == snakebody[0].position.x)
             {
-                if (direction == Direction::Up)
-                    direction = Direction::Left;
+                if (apples.Get_apples()[closest].pos.y < snakebody[0].position.y)
+                    direction = Direction::Up;
                 else
                     direction = Direction::Down;
             }
-            else if (apple.x > snakebody[0].position.x && apple.y < snakebody[0].position.y && (direction == Direction::Down || direction == Direction::Left))
+            else if (apples.Get_apples()[closest].pos.y == snakebody[0].position.y)
             {
-                if (direction == Direction::Down)
-                    direction = Direction::Right;
+                if (apples.Get_apples()[closest].pos.x < snakebody[0].position.x)
+                    direction = Direction::Left;
                 else
-                    direction = Direction::Up;
+                    direction = Direction::Right;
             }
-            else if (apple.x > snakebody[0].position.x && apple.y > snakebody[0].position.y && (direction == Direction::Up || direction == Direction::Left))
+            else
             {
-                if (direction == Direction::Up)
-                    direction = Direction::Right;
-                else
-                    direction = Direction::Down;
+                if (apples.Get_apples()[closest].pos.x < snakebody[0].position.x && apples.Get_apples()[closest].pos.y < snakebody[0].position.y && (direction == Direction::Down || direction == Direction::Right))
+                {
+                    if (direction == Direction::Down)
+                        direction = Direction::Left;
+                    else
+                        direction = Direction::Up;
+                }
+                else if (apples.Get_apples()[closest].pos.x < snakebody[0].position.x && apples.Get_apples()[closest].pos.y > snakebody[0].position.y && (direction == Direction::Up || direction == Direction::Right))
+                {
+                    if (direction == Direction::Up)
+                        direction = Direction::Left;
+                    else
+                        direction = Direction::Down;
+                }
+                else if (apples.Get_apples()[closest].pos.x > snakebody[0].position.x && apples.Get_apples()[closest].pos.y < snakebody[0].position.y && (direction == Direction::Down || direction == Direction::Left))
+                {
+                    if (direction == Direction::Down)
+                        direction = Direction::Right;
+                    else
+                        direction = Direction::Up;
+                }
+                else if (apples.Get_apples()[closest].pos.x > snakebody[0].position.x && apples.Get_apples()[closest].pos.y > snakebody[0].position.y && (direction == Direction::Up || direction == Direction::Left))
+                {
+                    if (direction == Direction::Up)
+                        direction = Direction::Right;
+                    else
+                        direction = Direction::Down;
+                }
             }
         }
     }

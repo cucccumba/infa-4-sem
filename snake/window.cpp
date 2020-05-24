@@ -38,6 +38,14 @@ void Window::Update()
     {
         if (event.type == sf::Event::Closed)
             isDone = true;
+        else if (event.type == sf::Event::Resized)
+        {
+            int w = event.size.width;
+            int h = event.size.height;
+            windowSize.x = event.size.width;
+            windowSize.y = event.size.height;
+            window.setView(sf::View(sf::Vector2f(w / 2.0, h / 2.0), sf::Vector2f(w, h)));
+        }
         else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F5)
             ToggleFullscreen();
     }
